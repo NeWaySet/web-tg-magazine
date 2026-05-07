@@ -169,6 +169,14 @@ h3 {
     max-width: 320px;
 }
 
+.field-label {
+    display: block;
+    margin: 14px 0 6px;
+    color: #333;
+    font-size: 0.95rem;
+    font-weight: 600;
+}
+
 .search-input:focus,
 .form-control:focus,
 .quantity-input:focus,

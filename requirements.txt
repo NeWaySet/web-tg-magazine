@@ -4,3 +4,4 @@ pg8000==1.31.2
 python-dotenv==1.0.0
 Werkzeug==3.0.1
 qrcode==7.4.2
+cryptography>=42.0.0

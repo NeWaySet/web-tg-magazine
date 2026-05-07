@@ -19,6 +19,8 @@ class Config:
     
     SECRET_KEY = os.getenv('SECRET_KEY', 'dev-secret-key')
     TELEGRAM_BOT_TOKEN = os.getenv('TELEGRAM_BOT_TOKEN', '')
+    DATA_ENCRYPTION_KEY = os.getenv('DATA_ENCRYPTION_KEY', '')
+    DATA_HASH_KEY = os.getenv('DATA_HASH_KEY', '')
     SBP_QR_PAYLOAD_TEMPLATE = os.getenv('SBP_QR_PAYLOAD_TEMPLATE', '')
     CRYPTO_ADDRESS = os.getenv('CRYPTO_ADDRESS', '')
     CRYPTO_ASSET = os.getenv('CRYPTO_ASSET', 'USDT')

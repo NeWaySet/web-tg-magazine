@@ -2,6 +2,8 @@
 CREATE TABLE users (
     id SERIAL PRIMARY KEY,
     email VARCHAR(255) NOT NULL UNIQUE,
+    email_encrypted TEXT,
+    email_lookup_hash VARCHAR(64),
     password_hash VARCHAR(255) NOT NULL,
     is_admin BOOLEAN DEFAULT FALSE,
     registered_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -22,6 +24,9 @@ CREATE TABLE orders (
     id SERIAL PRIMARY KEY,
     user_id INTEGER NOT NULL,
     status VARCHAR(50) DEFAULT 'cart',
+    delivery_address_encrypted TEXT,
+    payment_snapshot_encrypted TEXT,
+    order_snapshot_encrypted TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT chk_status CHECK (status IN ('cart', 'processing', 'confirmed', 'delivering', 'received', 'new', 'completed', 'cancelled')),
     CONSTRAINT fk_orders_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
@@ -56,6 +61,7 @@ CREATE INDEX idx_orders_status ON orders(status);
 CREATE INDEX idx_order_items_order_id ON order_items(order_id);
 CREATE INDEX idx_order_items_product_id ON order_items(product_id);
 CREATE INDEX idx_users_email ON users(email);
+CREATE UNIQUE INDEX idx_users_email_lookup_hash ON users(email_lookup_hash);
 CREATE INDEX idx_products_name ON products(name);
 CREATE INDEX idx_order_status_history_order_id ON order_status_history(order_id);
 

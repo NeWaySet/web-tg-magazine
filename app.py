@@ -8,7 +8,7 @@ from models import (
     get_all_orders, get_order_details, update_order_status,
     create_product, update_product, delete_product,
     get_admin_users, get_admin_system_stats,
-    ensure_order_status_schema, get_order_status_history
+    ensure_order_status_schema, ensure_encryption_schema, get_order_status_history
 )
 from werkzeug.security import check_password_hash, generate_password_hash
 import logging
@@ -87,6 +87,7 @@ def create_app(config_class=Config):
             logger.warning("Не удалось соединиться с БД.")
         else:
             ensure_order_status_schema()
+            ensure_encryption_schema()
     # Регистрация маршрутов
     register_routes(app)
     # Регистрация обработчиков ошибок
@@ -196,6 +197,7 @@ def serialize_order(order):
         'status': order.get('status'),
         'status_label': ORDER_STATUS_LABELS.get(order.get('status'), order.get('status')),
         'created_at': created_at.isoformat() if hasattr(created_at, 'isoformat') else created_at,
+        'delivery_address': order.get('delivery_address') or '',
         'status_history': [
             {
                 'id': item.get('id'),
@@ -648,6 +650,7 @@ def register_routes(app):
     def telegram_create_payment():
         payload = request.get_json(silent=True) or {}
         method = payload.get('method')
+        delivery_address = (payload.get('delivery_address') or '').strip()
         items = get_cart_items(session['user_id'])
         if not items:
             return jsonify({'error': 'Корзина пуста.'}), 400
@@ -666,6 +669,7 @@ def register_routes(app):
             'method': method,
             'amount': amount,
             'crypto': crypto_info,
+            'delivery_address': delivery_address,
             'cart_signature': cart_signature(items),
             'status': 'pending',
             'created_at': time.time()
@@ -782,7 +786,19 @@ def register_routes(app):
         if not payment:
             return jsonify({'error': 'Сначала оплатите заказ через QR-код.'}), 402
 
-        order_id = place_order(session['user_id'])
+        payment_snapshot = {
+            'payment_id': payment['id'],
+            'method': payment['method'],
+            'amount': payment['amount'],
+            'comment': payment_comment(payment['id']),
+            'crypto': payment.get('crypto'),
+            'confirmed_at': payment.get('confirmed_at')
+        }
+        order_id = place_order(
+            session['user_id'],
+            delivery_address=payment.get('delivery_address'),
+            payment_snapshot=payment_snapshot
+        )
         if not order_id:
             return jsonify({'error': 'Не удалось оформить заказ.'}), 400
         payment['status'] = 'used'

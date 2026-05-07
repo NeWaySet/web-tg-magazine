@@ -156,8 +156,8 @@
 
     function updateCounters() {
         const count = cartCount();
-        els.cartCounter.textContent = count;
-        els.mobileCartCounter.textContent = count;
+        if (els.cartCounter) els.cartCounter.textContent = count;
+        if (els.mobileCartCounter) els.mobileCartCounter.textContent = count;
     }
 
     function filteredProducts() {
@@ -461,6 +461,8 @@
                 </div>
                 <p class="muted">Сначала оплатите заказ через QR. После оплаты нажмите подтверждение.</p>
                 <p class="price">${formatPrice(state.cart.total)}</p>
+                <label class="field-label" for="deliveryAddress">Адрес доставки</label>
+                <textarea class="form-control" id="deliveryAddress" rows="3" placeholder="Город, улица, дом, квартира"></textarea>
                 <div class="payment-methods">
                     ${state.paymentMethods.map((method) => `
                         <button class="payment-method" type="button" data-action="create-payment" data-method="${method.id}" ${method.configured ? '' : 'disabled'}>
@@ -478,9 +480,10 @@
 
     async function createPayment(method) {
         try {
+            const deliveryAddress = document.getElementById('deliveryAddress')?.value || '';
             const data = await api('/api/market/payments', {
                 method: 'POST',
-                body: JSON.stringify({ method })
+                body: JSON.stringify({ method, delivery_address: deliveryAddress })
             });
             state.currentPayment = data.payment;
             const crypto = state.currentPayment.crypto;
