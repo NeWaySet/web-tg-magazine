@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+
+{% block title %}Система и БД - Web Market{% endblock %}
+
+{% block content %}
+<h1 style="margin-bottom: 2rem;">Система и БД</h1>
+
+<div class="card">
+    <h2 style="margin-bottom: 1rem;">Сводка</h2>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 1rem;">
+        <div style="padding: 1rem; background: #f8f9fa; border-radius: 8px;">
+            <div style="color: #666; font-size: 0.9rem;">Пользователи</div>
+            <strong style="font-size: 1.6rem;">{{ stats.users_count or 0 }}</strong>
+        </div>
+        <div style="padding: 1rem; background: #f8f9fa; border-radius: 8px;">
+            <div style="color: #666; font-size: 0.9rem;">Активные корзины</div>
+            <strong style="font-size: 1.6rem;">{{ stats.carts_count or 0 }}</strong>
+        </div>
+        <div style="padding: 1rem; background: #f8f9fa; border-radius: 8px;">
+            <div style="color: #666; font-size: 0.9rem;">Заказы</div>
+            <strong style="font-size: 1.6rem;">{{ stats.orders_count or 0 }}</strong>
+        </div>
+        <div style="padding: 1rem; background: #f8f9fa; border-radius: 8px;">
+            <div style="color: #666; font-size: 0.9rem;">Мало на складе</div>
+            <strong style="font-size: 1.6rem; color: #e74c3c;">{{ stats.low_stock_count or 0 }}</strong>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <h2 style="margin-bottom: 1rem;">Пользователи</h2>
+    {% if users %}
+        <table style="width: 100%; border-collapse: collapse;">
+            <thead>
+                <tr style="background: #f8f9fa; border-bottom: 2px solid #dee2e6;">
+                    <th style="padding: 1rem; text-align: left;">ID</th>
+                    <th style="padding: 1rem; text-align: left;">Email / Telegram</th>
+                    <th style="padding: 1rem; text-align: center;">Админ</th>
+                    <th style="padding: 1rem; text-align: right;">Заказы</th>
+                    <th style="padding: 1rem; text-align: right;">Сумма</th>
+                    <th style="padding: 1rem; text-align: left;">Регистрация</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for user in users %}
+                    <tr style="border-bottom: 1px solid #dee2e6;">
+                        <td style="padding: 1rem;"><strong>#{{ user.id }}</strong></td>
+                        <td style="padding: 1rem;">{{ user.email }}</td>
+                        <td style="padding: 1rem; text-align: center;">{% if user.is_admin %}Да{% else %}Нет{% endif %}</td>
+                        <td style="padding: 1rem; text-align: right;">{{ user.orders_count }}</td>
+                        <td style="padding: 1rem; text-align: right;">{{ "%.2f"|format(user.total_spent or 0) }} руб.</td>
+                        <td style="padding: 1rem;">{{ user.registered_at.strftime('%d.%m.%Y %H:%M') if user.registered_at else '-' }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        {% if has_prev or has_next %}
+            <div style="margin-top: 1.5rem; display: flex; justify-content: center; gap: 1rem;">
+                {% if has_prev %}
+                    <a href="{{ url_for('admin_system', page=page-1, per_page=per_page) }}" class="btn btn-secondary">← Назад</a>
+                {% endif %}
+                <span style="align-self: center; color: #666;">Страница {{ page }}</span>
+                {% if has_next %}
+                    <a href="{{ url_for('admin_system', page=page+1, per_page=per_page) }}" class="btn">Вперёд →</a>
+                {% endif %}
+            </div>
+        {% endif %}
+    {% else %}
+        <p style="color: #666;">Пользователи не найдены.</p>
+    {% endif %}
+</div>
+
+<div class="card">
+    <h2 style="margin-bottom: 1rem;">Товары с низким остатком</h2>
+    {% if stats.low_stock_products %}
+        <table style="width: 100%; border-collapse: collapse;">
+            <thead>
+                <tr style="background: #f8f9fa; border-bottom: 2px solid #dee2e6;">
+                    <th style="padding: 1rem; text-align: left;">ID</th>
+                    <th style="padding: 1rem; text-align: left;">Название</th>
+                    <th style="padding: 1rem; text-align: right;">Цена</th>
+                    <th style="padding: 1rem; text-align: right;">Остаток</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for product in stats.low_stock_products %}
+                    <tr style="border-bottom: 1px solid #dee2e6;">
+                        <td style="padding: 1rem;"><strong>#{{ product.id }}</strong></td>
+                        <td style="padding: 1rem;">{{ product.name }}</td>
+                        <td style="padding: 1rem; text-align: right;">{{ "%.2f"|format(product.price or 0) }} руб.</td>
+                        <td style="padding: 1rem; text-align: right; color: #e74c3c; font-weight: bold;">{{ product.stock }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p style="color: #666;">Критичных остатков нет.</p>
+    {% endif %}
+</div>
+
+<div style="margin-top: 1.5rem; text-align: center;">
+    <a href="{{ url_for('admin_dashboard') }}" class="btn btn-secondary">← Назад в админку</a>
+</div>
+{% endblock %}

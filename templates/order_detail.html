@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+
+{% block title %}Заказ #{{ order.id }} - Web Market{% endblock %}
+
+{% block content %}
+<div class="card" style="max-width: 800px; margin: 2rem auto;">
+    <div style="text-align: center; margin-bottom: 2rem; padding-bottom: 1.5rem; border-bottom: 2px solid #667eea;">
+        <h1 style="color: #667eea; margin-bottom: 0.5rem;">Заказ #{{ order.id }}</h1>
+        <p style="color: #666;">
+            Статус: 
+            <span style="font-weight: bold; padding: 0.25rem 1rem; border-radius: 20px; background: {% if order.status == 'completed' %}#d4edda{% elif order.status == 'cancelled' %}#f8d7da{% else %}#fff3cd{% endif %}; color: {% if order.status == 'completed' %}#155724{% elif order.status == 'cancelled' %}#721c24{% else %}#856404{% endif %};">
+                {% if order.status == 'cart' %}В корзине{% elif order.status == 'new' %}Новый{% elif order.status == 'processing' %}Обрабатывается{% elif order.status == 'completed' %}Выполнен{% elif order.status == 'cancelled' %}Отменен{% endif %}
+            </span>
+        </p>
+        <p style="color: #999; margin-top: 0.5rem;">
+            Дата оформления: {{ order.created_at.strftime('%d.%m.%Y %H:%M') }}
+        </p>
+    </div>
+    
+    <!-- Список товаров -->
+    <h2 style="margin-bottom: 1.5rem;">Состав заказа</h2>
+    
+    {% if order.items %}
+        <div style="margin-bottom: 2rem;">
+            {% for item in order.items %}
+                <div style="display: grid; grid-template-columns: 1fr auto auto; gap: 1rem; align-items: center; padding: 1rem 0; border-bottom: 1px solid #eee;">
+                    <!-- Товар -->
+                    <div>
+                        <h3 style="margin-bottom: 0.25rem; color: #333;">{{ item.name }}</h3>
+                        <p style="color: #666; font-size: 0.9rem;">Артикул: {{ item.product_id }}</p>
+                    </div>
+                    
+                    <!-- Количество и цена -->
+                    <div style="text-align: center;">
+                        <p style="font-size: 0.9rem; color: #666;">{{ item.quantity }} шт. × {{ "%.2f"|format(item.price_at_time) }} руб.</p>
+                    </div>
+                    
+                    <!-- Стоимость -->
+                    <div style="text-align: right;">
+                        <p style="font-size: 1.1rem; font-weight: bold; color: #e74c3c;">
+                            {{ "%.2f"|format(item.quantity * item.price_at_time) }} руб.
+                        </p>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+        
+        <!-- Итого -->
+        <div style="background: #f8f9fa; padding: 1.5rem; border-radius: 5px; margin-top: 1rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <h3 style="margin: 0;">Итого к оплате:</h3>
+                <p style="font-size: 1.75rem; font-weight: bold; color: #e74c3c; margin: 0;">
+                    {{ "%.2f"|format(total) }} руб.
+                </p>
+            </div>
+        </div>
+    {% else %}
+        <p style="color: #666; text-align: center; padding: 2rem;">Заказ не содержит товаров</p>
+    {% endif %}
+    
+    <!-- Кнопки -->
+    <div style="margin-top: 2rem; display: flex; gap: 1rem;">
+        <a href="{{ url_for('cart') }}" class="btn btn-secondary">
+            ← Вернуться в корзину
+        </a>
+        <a href="{{ url_for('catalog') }}" class="btn">
+            Продолжить покупки
+        </a>
+    </div>
+</div>
+{% endblock %}

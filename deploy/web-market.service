@@ -1,0 +1,15 @@
+[Unit]
+Description=Web Market Flask application
+After=network.target postgresql.service
+
+[Service]
+User=www-data
+Group=www-data
+WorkingDirectory=/var/www/web_market
+Environment="PATH=/var/www/web_market/.venv/bin"
+ExecStart=/var/www/web_market/.venv/bin/gunicorn -w 2 -b 127.0.0.1:8000 app:app
+Restart=always
+RestartSec=3
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+
+{% block title %}Мои заказы - Web Market{% endblock %}
+
+{% block content %}
+<h1 style="margin-bottom: 2rem;">Мои заказы</h1>
+
+{% if orders %}
+    <div class="card">
+        <table style="width: 100%; border-collapse: collapse;">
+            <thead>
+                <tr style="background: #f8f9fa; border-bottom: 2px solid #dee2e6;">
+                    <th style="padding: 1rem; text-align: left;">№ заказа</th>
+                    <th style="padding: 1rem; text-align: left;">Дата</th>
+                    <th style="padding: 1rem; text-align: center;">Статус</th>
+                    <th style="padding: 1rem; text-align: right;">Сумма</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for order in orders %}
+                    <tr style="border-bottom: 1px solid #dee2e6;">
+                        <td style="padding: 1rem;">
+                            <strong>#{{ order.id }}</strong>
+                        </td>
+                        <td style="padding: 1rem;">
+                            {{ order.created_at.strftime('%d.%m.%Y %H:%M') }}
+                        </td>
+                        <td style="padding: 1rem; text-align: center;">
+                            <span style="padding: 0.25rem 1rem; border-radius: 20px; font-size: 0.85rem; font-weight: bold; background: {% if order.status == 'completed' %}#d4edda{% elif order.status == 'cancelled' %}#f8d7da{% elif order.status == 'processing' %}#d1ecf1{% else %}#fff3cd{% endif %}; color: {% if order.status == 'completed' %}#155724{% elif order.status == 'cancelled' %}#721c24{% elif order.status == 'processing' %}#0c5460{% else %}#856404{% endif %};">
+                                {% if order.status == 'new' %}Новый{% elif order.status == 'processing' %}Обрабатывается{% elif order.status == 'completed' %}Выполнен{% elif order.status == 'cancelled' %}Отменен{% endif %}
+                            </span>
+                        </td>
+                        <td style="padding: 1rem; text-align: right;">
+                            <strong style="font-size: 1.1rem; color: #e74c3c;">
+                                {{ "%.2f"|format(order.total) }} руб.
+                            </strong>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    
+    <!-- Продолжить покупки -->
+    <div style="margin-top: 1.5rem; text-align: center;">
+        <a href="{{ url_for('catalog') }}" class="btn btn-secondary">
+            ← Продолжить покупки
+        </a>
+    </div>
+    
+{% else %}
+    <div class="card" style="text-align: center; padding: 3rem;">
+        <h2 style="color: #666; margin-bottom: 1rem;">У вас пока нет заказов</h2>
+        <p style="color: #999; margin-bottom: 2rem;">Оформите первый заказ в нашем магазине!</p>
+        <a href="{{ url_for('catalog') }}" class="btn">
+            Перейти в каталог
+        </a>
+    </div>
+{% endif %}
+{% endblock %}

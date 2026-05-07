@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+
+{% block title %}Доступ запрещен - Web Market{% endblock %}
+
+{% block content %}
+<div class="card" style="text-align: center; padding: 3rem;">
+    <h1>Доступ запрещен</h1>
+    <p style="color: #666; margin: 1rem 0 2rem;">Эта часть системы доступна только с разрешенного IP или host.</p>
+    <a href="{{ url_for('index') }}" class="btn btn-secondary">На главную</a>
+</div>
+{% endblock %}

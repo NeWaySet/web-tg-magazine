@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block title %}Админ-панель - Web Market{% endblock %}
+
+{% block content %}
+<h1 style="margin-bottom: 2rem;">Админ-панель</h1>
+
+<div class="card">
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 1rem;">
+        <div style="padding: 1rem; background: #f8f9fa; border-radius: 8px;">
+            <div style="color: #666; font-size: 0.9rem;">Пользователи</div>
+            <strong style="font-size: 1.8rem;">{{ stats.users_count or 0 }}</strong>
+        </div>
+        <div style="padding: 1rem; background: #f8f9fa; border-radius: 8px;">
+            <div style="color: #666; font-size: 0.9rem;">Товары</div>
+            <strong style="font-size: 1.8rem;">{{ stats.products_count or 0 }}</strong>
+        </div>
+        <div style="padding: 1rem; background: #f8f9fa; border-radius: 8px;">
+            <div style="color: #666; font-size: 0.9rem;">Заказы</div>
+            <strong style="font-size: 1.8rem;">{{ stats.orders_count or 0 }}</strong>
+        </div>
+        <div style="padding: 1rem; background: #f8f9fa; border-radius: 8px;">
+            <div style="color: #666; font-size: 0.9rem;">Выручка</div>
+            <strong style="font-size: 1.8rem;">{{ "%.2f"|format(stats.revenue or 0) }} руб.</strong>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <h2 style="margin-bottom: 1rem;">Управление</h2>
+    <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+        <a href="{{ url_for('admin_system') }}" class="btn">Система и БД</a>
+        <a href="{{ url_for('admin_orders') }}" class="btn">Управление заказами</a>
+        <a href="{{ url_for('admin_products') }}" class="btn btn-secondary">Управление товарами</a>
+    </div>
+</div>
+
+<div class="card">
+    <h2 style="margin-bottom: 1rem;">Сетевой доступ</h2>
+    <p style="color: #666; line-height: 1.6;">
+        Текущий IP клиента: <strong>{{ admin_client_ip }}</strong><br>
+        Текущий host админки: <strong>{{ admin_host }}</strong>
+    </p>
+    <p style="color: #666; line-height: 1.6;">
+        Ограничения задаются в <code>.env</code>: <code>ADMIN_ALLOWED_IPS</code> и <code>ADMIN_ALLOWED_HOSTS</code>.
+    </p>
+</div>
+{% endblock %}

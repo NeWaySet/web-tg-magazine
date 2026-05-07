@@ -1,0 +1,2 @@
+Archive excludes .env, .venv, .git and __pycache__.
+Copy deploy/.env.production.example to .env on the server and fill secrets there.

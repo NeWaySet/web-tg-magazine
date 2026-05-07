@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Web Market Mini App</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='telegram-mini-app.css') }}">
+</head>
+<body>
+    <div class="app-shell">
+        <header class="app-header">
+            <div>
+                <p class="eyebrow">Web Market</p>
+                <h1>Техника</h1>
+            </div>
+            <div class="header-actions">
+                <div class="user-chip" id="userChip" hidden>
+                    <span class="user-avatar" aria-hidden="true">T</span>
+                    <span id="userName">Telegram</span>
+                </div>
+                <button class="icon-button" type="button" data-action="refresh" aria-label="Обновить каталог" title="Обновить каталог">
+                    <span aria-hidden="true">↻</span>
+                </button>
+            </div>
+        </header>
+
+        <main>
+            <section class="auth-panel" id="authPanel" hidden>
+                <div class="auth-card">
+                    <span class="auth-icon" aria-hidden="true">↗</span>
+                    <h2>Войдите через Telegram</h2>
+                    <p id="authStatus">Mini App привязывает корзину, оплату и заказы к вашему Telegram-аккаунту.</p>
+                    <button class="primary-button" type="button" id="retryAuthButton">Повторить вход</button>
+                </div>
+            </section>
+
+            <section class="view is-active" id="view-catalog" aria-label="Каталог">
+                <div class="search-row">
+                    <input class="search-input" id="searchInput" type="search" placeholder="Поиск" autocomplete="off">
+                </div>
+                <div class="product-grid" id="productGrid"></div>
+                <button class="load-more" id="loadMoreButton" type="button">Показать еще</button>
+            </section>
+
+            <section class="view" id="view-cart" aria-label="Корзина">
+                <div class="cart-list" id="cartList"></div>
+                <div class="checkout-bar" id="checkoutBar">
+                    <div>
+                        <span>Итого</span>
+                        <strong id="cartTotal">0 ₽</strong>
+                    </div>
+                    <button class="primary-button" type="button" data-action="checkout">Оформить</button>
+                </div>
+            </section>
+
+            <section class="view" id="view-orders" aria-label="Заказы">
+                <div class="orders-list" id="ordersList"></div>
+            </section>
+        </main>
+
+        <nav class="tabbar" aria-label="Разделы">
+            <button class="tab-button is-active" type="button" data-view="catalog">
+                <span aria-hidden="true">⌂</span>
+                <small>Каталог</small>
+            </button>
+            <button class="tab-button" type="button" data-view="cart">
+                <span aria-hidden="true">◴</span>
+                <small>Корзина</small>
+                <b class="badge" id="cartBadge">0</b>
+            </button>
+            <button class="tab-button" type="button" data-view="orders">
+                <span aria-hidden="true">□</span>
+                <small>Заказы</small>
+            </button>
+        </nav>
+    </div>
+
+    <div class="sheet-backdrop" id="sheetBackdrop" hidden></div>
+    <aside class="product-sheet" id="productSheet" aria-hidden="true"></aside>
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+    <script src="{{ url_for('static', filename='telegram-mini-app.js') }}"></script>
+</body>
+</html>

@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Web Market</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='market.css') }}">
+</head>
+<body>
+    <div class="market-shell">
+        <header class="topbar">
+            <div class="nav-container">
+                <a class="brand" href="{{ url_for('market') }}">
+                    <span class="brand-mark">W</span>
+                    <span>Web Market</span>
+                </a>
+
+                <div class="account-area">
+                    <div class="account-chip" id="accountChip" hidden>
+                        <span class="account-avatar" id="accountAvatar">U</span>
+                        <span id="accountName">Аккаунт</span>
+                    </div>
+                    <button class="secondary-button small-only" type="button" data-action="open-auth" id="authButton">Войти</button>
+                    <button class="icon-button" type="button" data-action="refresh" aria-label="Обновить каталог" title="Обновить каталог">↻</button>
+                </div>
+            </div>
+        </header>
+
+        <main class="main-grid">
+            <section class="catalog-view view is-active" id="view-catalog">
+                <div class="catalog-head">
+                    <div>
+                        <p class="eyebrow" id="runtimeLabel">Веб-магазин техники</p>
+                        <h1>Каталог товаров</h1>
+                    </div>
+                    <input class="search-input" id="searchInput" type="search" placeholder="Поиск по товарам" autocomplete="off">
+                </div>
+                <div class="product-grid" id="productGrid"></div>
+                <button class="load-more" id="loadMoreButton" type="button">Показать еще</button>
+            </section>
+
+            <aside class="side-panel view" id="view-cart">
+                <div class="panel-head">
+                    <h2>Корзина</h2>
+                    <button class="secondary-button" type="button" data-view="catalog">Продолжить покупки</button>
+                </div>
+                <div class="cart-list" id="cartList"></div>
+                <div class="checkout-panel" id="checkoutPanel" hidden>
+                    <div>
+                        <span>Итого</span>
+                        <strong id="cartTotal">0 ₽</strong>
+                    </div>
+                    <button class="primary-button" type="button" data-action="checkout">Оплатить и оформить</button>
+                </div>
+            </aside>
+
+            <section class="orders-view view" id="view-orders">
+                <div class="panel-head">
+                    <h2>Мои заказы</h2>
+                    <button class="secondary-button" type="button" data-view="catalog">В каталог</button>
+                </div>
+                <div class="orders-list" id="ordersList"></div>
+            </section>
+        </main>
+
+        <nav class="mobile-tabs" aria-label="Разделы">
+            <button class="tab-link is-active" type="button" data-view="catalog">Каталог</button>
+            <button class="tab-link" type="button" data-view="cart">Корзина <span id="mobileCartCounter">0</span></button>
+            <button class="tab-link" type="button" data-view="orders">Заказы</button>
+        </nav>
+    </div>
+
+    <div class="modal-backdrop" id="modalBackdrop" hidden></div>
+
+    <section class="modal" id="authModal" aria-hidden="true">
+        <div class="modal-head">
+            <h2 id="authTitle">Вход</h2>
+            <button class="icon-button" type="button" data-action="close-auth" aria-label="Закрыть">×</button>
+        </div>
+        <p class="muted" id="authHint">В браузере используйте email и пароль. В Telegram вход выполняется автоматически.</p>
+        <form class="auth-form" id="authForm">
+            <input class="form-control" type="email" name="email" placeholder="Email" autocomplete="email" required>
+            <input class="form-control" type="password" name="password" placeholder="Пароль" autocomplete="current-password" required>
+            <button class="primary-button" type="submit" id="authSubmit">Войти</button>
+        </form>
+        <button class="text-button" type="button" data-action="toggle-auth" id="toggleAuthButton">Создать аккаунт</button>
+    </section>
+
+    <section class="modal product-modal" id="productModal" aria-hidden="true"></section>
+    <section class="modal payment-modal" id="paymentModal" aria-hidden="true"></section>
+
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+    <script src="{{ url_for('static', filename='market.js') }}"></script>
+</body>
+</html>

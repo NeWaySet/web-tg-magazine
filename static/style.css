@@ -1,0 +1,40 @@
+/* Минимальные стили для таблиц и форм админки/публичных страниц */
+table th,
+table td {
+    vertical-align: middle;
+}
+
+.form-control {
+    box-sizing: border-box;
+}
+
+.product-image {
+    width: 100%;
+    height: 180px;
+    object-fit: contain;
+    display: block;
+    border-radius: 6px;
+    margin-bottom: 0.75rem;
+    background: #ffffff;
+}
+
+.cart-product-image {
+    width: 160px;
+    max-width: 160px;
+    height: 90px;
+    object-fit: contain;
+    display: block;
+    border-radius: 6px;
+    background: #ffffff;
+}
+
+.product-detail-image {
+    width: 100%;
+    height: 320px;
+    object-fit: contain;
+    display: block;
+    border-radius: 10px;
+    background: #ffffff;
+    margin-bottom: 1rem;
+}
+

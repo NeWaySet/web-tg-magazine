@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+
+{% block title %}Управление товарами - Web Market{% endblock %}
+
+{% block content %}
+<h1 style="margin-bottom: 2rem;">Управление товарами</h1>
+
+<div class="card">
+    <h2 style="margin-bottom: 1.5rem;">Добавить товар</h2>
+    <form method="POST" action="{{ url_for('admin_products') }}" enctype="multipart/form-data" style="max-width: 700px; margin: 0 auto;">
+        <div class="form-group">
+            <label for="name">Название</label>
+            <input type="text" id="name" name="name" class="form-control" />
+        </div>
+
+        <div class="form-group">
+            <label for="description">Описание</label>
+            <textarea id="description" name="description" class="form-control" rows="4"></textarea>
+        </div>
+
+        <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+            <div style="flex: 1; min-width: 180px;">
+                <div class="form-group">
+                    <label for="price">Цена</label>
+                    <input type="number" step="0.01" id="price" name="price" class="form-control" />
+                </div>
+            </div>
+
+            <div style="flex: 1; min-width: 180px;">
+                <div class="form-group">
+                    <label for="stock">Склад</label>
+                    <input type="number" id="stock" name="stock" class="form-control" />
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="image">Картинка товара (PNG)</label>
+            <input type="file" id="image" name="image" class="form-control" accept=".png,image/png" />
+        </div>
+
+        <button type="submit" class="btn">Добавить</button>
+    </form>
+</div>
+
+<div style="height: 1.5rem;"></div>
+
+{% if products %}
+    <div class="card">
+        <table style="width: 100%; border-collapse: collapse;">
+            <thead>
+                <tr style="background: #f8f9fa; border-bottom: 2px solid #dee2e6;">
+                    <th style="padding: 1rem; text-align: left;">ID</th>
+                    <th style="padding: 1rem; text-align: left;">Название</th>
+                    <th style="padding: 1rem; text-align: right;">Цена</th>
+                    <th style="padding: 1rem; text-align: right;">Склад</th>
+                    <th style="padding: 1rem; text-align: center;">Действия</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for product in products %}
+                    <tr style="border-bottom: 1px solid #dee2e6;">
+                        <td style="padding: 1rem;">
+                            <strong>#{{ product.id }}</strong>
+                        </td>
+                        <td style="padding: 1rem;">
+                            {{ product.name }}
+                            {% if product.description %}
+                                <div style="color: #666; font-size: 0.9rem; margin-top: 0.25rem;">
+                                    {{ product.description[:80] }}{% if product.description|length > 80 %}...{% endif %}
+                                </div>
+                            {% endif %}
+                        </td>
+                        <td style="padding: 1rem; text-align: right;">
+                            <strong>{{ "%.2f"|format(product.price) }} руб.</strong>
+                        </td>
+                        <td style="padding: 1rem; text-align: right;">
+                            {{ product.stock }}
+                        </td>
+                        <td style="padding: 1rem; text-align: center;">
+                            <div style="display: flex; gap: 0.5rem; justify-content: center; flex-wrap: wrap;">
+                                <a href="{{ url_for('admin_edit_product', product_id=product.id) }}" class="btn btn-secondary" style="padding: 0.5rem 1rem;">
+                                    Редактировать
+                                </a>
+                                <form method="POST" action="{{ url_for('admin_delete_product', product_id=product.id) }}">
+                                    <button type="submit" class="btn" style="padding: 0.5rem 1rem;" onclick="return confirm('Удалить товар?')">
+                                        Удалить
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        {% if has_prev or has_next %}
+            <div style="margin-top: 1.5rem; display: flex; justify-content: center; gap: 1rem;">
+                {% if has_prev %}
+                    <a href="{{ url_for('admin_products', page=page-1, per_page=per_page) }}" class="btn btn-secondary">
+                        ← Назад
+                    </a>
+                {% endif %}
+                <span style="align-self: center; color: #666;">Страница {{ page }}</span>
+                {% if has_next %}
+                    <a href="{{ url_for('admin_products', page=page+1, per_page=per_page) }}" class="btn">
+                        Вперед →
+                    </a>
+                {% endif %}
+            </div>
+        {% endif %}
+    </div>
+{% else %}
+    <div class="card" style="text-align: center; padding: 3rem;">
+        <h2 style="color: #666; margin-bottom: 1rem;">Товаров пока нет</h2>
+        <p style="color: #999; margin-bottom: 2rem;">Добавьте первый товар в форму сверху.</p>
+    </div>
+{% endif %}
+{% endblock %}
+

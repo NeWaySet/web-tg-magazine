@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+
+{% block title %}{{ product.name }} - Web Market{% endblock %}
+
+{% block content %}
+<div class="card" style="max-width: 800px; margin: 2rem auto;">
+    <div style="display: grid; grid-template-columns: 1fr; gap: 2rem;">
+        <!-- Информация о товаре -->
+        <div>
+            <img
+                src="{{ url_for('static', filename='images/' ~ product.id ~ '.png') }}"
+                onerror="this.onerror=null; this.src='{{ url_for('static', filename='images/default.png') }}';"
+                class="product-detail-image"
+                alt="{{ product.name }}"
+            />
+            <h1 style="color: #667eea; margin-bottom: 1rem;">{{ product.name }}</h1>
+            
+            <p style="color: #e74c3c; font-size: 2rem; font-weight: bold; margin: 1rem 0;">
+                {{ "%.2f"|format(product.price) }} руб.
+            </p>
+            
+            <div style="background: #f8f9fa; padding: 1rem; border-radius: 5px; margin: 1.5rem 0;">
+                <strong>Наличие на складе:</strong>
+                {% if product.stock > 0 %}
+                    <span style="color: #27ae60; font-weight: bold;">{{ product.stock }} шт.</span>
+                {% else %}
+                    <span style="color: #e74c3c; font-weight: bold;">Нет в наличии</span>
+                {% endif %}
+            </div>
+            
+            <div style="margin: 2rem 0;">
+                <h3>Описание товара</h3>
+                <p style="line-height: 1.8; color: #555; margin-top: 1rem;">
+                    {{ product.description }}
+                </p>
+            </div>
+            
+            <!-- Кнопка добавления в корзину -->
+            {% if session.get('user_id') %}
+                {% if product.stock > 0 %}
+                    <form method="POST" action="{{ url_for('add_to_cart_route', product_id=product.id) }}" style="margin-top: 2rem;">
+                        <div style="display: flex; gap: 1rem; align-items: center;">
+                            <div style="flex: 0 0 120px;">
+                                <label for="quantity" style="display: block; margin-bottom: 0.5rem; color: #666;">Количество:</label>
+                                <input type="number" id="quantity" name="quantity" value="1" min="1" max="{{ product.stock }}" class="form-control" style="text-align: center;">
+                            </div>
+                            <button type="submit" class="btn" style="flex: 1; padding: 0.75rem; font-size: 1.1rem;">
+                                Добавить в корзину
+                            </button>
+                        </div>
+                        <p style="margin-top: 0.5rem; color: #27ae60; font-size: 0.9rem;">
+                            Доступно: {{ product.stock }} шт.
+                        </p>
+                    </form>
+                {% else %}
+                    <button class="btn btn-secondary" style="width: 100%; padding: 1rem; font-size: 1.1rem;" disabled>
+                        Товар отсутствует
+                    </button>
+                {% endif %}
+            {% else %}
+                <div style="margin-top: 2rem; text-align: center;">
+                    <p style="color: #666; margin-bottom: 1rem;">
+                        Для покупки необходимо войти в систему
+                    </p>
+                    <a href="{{ url_for('login', next=request.url) }}" class="btn">
+                        Войти
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+    
+    <!-- Кнопка назад -->
+    <div style="margin-top: 2rem;">
+        <a href="{{ url_for('catalog') }}" class="btn btn-secondary">
+            ← Вернуться к каталогу
+        </a>
+    </div>
+</div>
+{% endblock %}

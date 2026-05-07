@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+
+{% block title %}Каталог - Web Market{% endblock %}
+
+{% block content %}
+<h1 style="margin-bottom: 2rem;">Каталог товаров</h1>
+
+{% if products %}
+    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.5rem;">
+        {% for product in products %}
+            <div class="card" style="padding: 1.5rem;">
+                <img
+                    src="{{ url_for('static', filename='images/' ~ product.id ~ '.png') }}"
+                    onerror="this.onerror=null; this.src='{{ url_for('static', filename='images/default.png') }}';"
+                    class="product-image"
+                    alt="{{ product.name }}"
+                />
+                <h3 style="margin-bottom: 0.5rem; color: #667eea;">{{ product.name }}</h3>
+                
+                <p style="color: #e74c3c; font-size: 1.25rem; font-weight: bold; margin: 1rem 0;">
+                    {{ "%.2f"|format(product.price) }} руб.
+                </p>
+                
+                <p style="color: #666; font-size: 0.9rem; line-height: 1.5; margin-bottom: 1rem;">
+                    {{ product.description[:100] }}{% if product.description|length > 100 %}...{% endif %}
+                </p>
+                
+                <a href="{{ url_for('product_detail', product_id=product.id) }}" class="btn" style="width: 100%; text-align: center;">
+                    Подробнее
+                </a>
+            </div>
+        {% endfor %}
+    </div>
+    
+    <!-- Пагинация -->
+    {% if has_prev or has_next %}
+        <div style="margin-top: 2rem; display: flex; justify-content: center; gap: 1rem;">
+            {% if has_prev %}
+                <a href="{{ url_for('catalog', page=page-1, per_page=per_page) }}" class="btn btn-secondary">
+                    ← Назад
+                </a>
+            {% endif %}
+            
+            <span style="align-self: center; color: #666;">
+                Страница {{ page }}
+            </span>
+            
+            {% if has_next %}
+                <a href="{{ url_for('catalog', page=page+1, per_page=per_page) }}" class="btn">
+                    Вперед →
+                </a>
+            {% endif %}
+        </div>
+    {% endif %}
+    
+{% else %}
+    <div class="card" style="text-align: center; padding: 3rem;">
+        <h2>Товары не найдены</h2>
+        <p style="color: #666; margin-top: 1rem;">В каталоге пока нет товаров.</p>
+    </div>
+{% endif %}
+{% endblock %}

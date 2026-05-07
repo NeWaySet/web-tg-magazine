@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+
+{% block title %}Управление заказами - Web Market{% endblock %}
+
+{% block content %}
+<h1 style="margin-bottom: 2rem;">Управление заказами</h1>
+
+{% if orders %}
+    <div class="card">
+        <table style="width: 100%; border-collapse: collapse;">
+            <thead>
+                <tr style="background: #f8f9fa; border-bottom: 2px solid #dee2e6;">
+                    <th style="padding: 1rem; text-align: left;">ID</th>
+                    <th style="padding: 1rem; text-align: left;">Пользователь (email)</th>
+                    <th style="padding: 1rem; text-align: left;">Дата</th>
+                    <th style="padding: 1rem; text-align: center;">Статус</th>
+                    <th style="padding: 1rem; text-align: right;">Сумма</th>
+                    <th style="padding: 1rem; text-align: center;">Действия</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for order in orders %}
+                    <tr style="border-bottom: 1px solid #dee2e6;">
+                        <td style="padding: 1rem;">
+                            <strong>#{{ order.id }}</strong>
+                        </td>
+                        <td style="padding: 1rem;">
+                            {{ order.email }}
+                        </td>
+                        <td style="padding: 1rem;">
+                            {{ order.created_at.strftime('%d.%m.%Y %H:%M') }}
+                        </td>
+                        <td style="padding: 1rem; text-align: center;">
+                            <span style="padding: 0.25rem 1rem; border-radius: 20px; font-size: 0.85rem; font-weight: bold; background: {% if order.status in ['received', 'completed'] %}#d4edda{% elif order.status == 'cancelled' %}#f8d7da{% elif order.status in ['delivering', 'processing'] %}#d1ecf1{% elif order.status == 'confirmed' %}#e7ddff{% else %}#fff3cd{% endif %}; color: {% if order.status in ['received', 'completed'] %}#155724{% elif order.status == 'cancelled' %}#721c24{% elif order.status in ['delivering', 'processing'] %}#0c5460{% elif order.status == 'confirmed' %}#5b3fb4{% else %}#856404{% endif %};">
+                                {{ order.status_label }}
+                            </span>
+                        </td>
+                        <td style="padding: 1rem; text-align: right;">
+                            <strong style="font-size: 1.1rem; color: #e74c3c;">
+                                {{ "%.2f"|format(order.total) }} руб.
+                            </strong>
+                        </td>
+                        <td style="padding: 1rem; text-align: center;">
+                            <form method="POST" action="{{ url_for('admin_update_order_status', order_id=order.id) }}">
+                                <select name="new_status" class="form-control" style="margin: 0 auto 0.5rem; max-width: 220px;">
+                                    <option value="processing" {% if order.status in ['processing', 'new'] %}selected{% endif %}>В обработке</option>
+                                    <option value="confirmed" {% if order.status == 'confirmed' %}selected{% endif %}>Подтвержден</option>
+                                    <option value="delivering" {% if order.status == 'delivering' %}selected{% endif %}>В доставке</option>
+                                    <option value="received" {% if order.status in ['received', 'completed'] %}selected{% endif %}>Получен</option>
+                                    <option value="cancelled" {% if order.status == 'cancelled' %}selected{% endif %}>Отменен</option>
+                                </select>
+                                <button type="submit" class="btn btn-secondary" style="padding: 0.5rem 1rem;">
+                                    Обновить
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                    <tr style="border-bottom: 1px solid #dee2e6;">
+                        <td colspan="6" style="padding: 0 1rem 1.25rem 1rem;">
+                            <div style="background: #f8f9fa; padding: 1rem; border-radius: 8px;">
+                                <div style="font-weight: bold; margin-bottom: 0.75rem;">Состав заказа</div>
+                                {% if order['items'] %}
+                                    <ul style="margin: 0; padding-left: 1.1rem;">
+                                        {% for item in order['items'] %}
+                                            <li style="margin-bottom: 0.35rem;">
+                                                {{ item.name }} ({{ item.quantity }} × {{ "%.2f"|format(item.price_at_time) }} руб.)
+                                                — {{ "%.2f"|format(item.quantity * item.price_at_time) }} руб.
+                                            </li>
+                                        {% endfor %}
+                                    </ul>
+                                {% else %}
+                                    <div style="color: #666;">Товары не найдены.</div>
+                                {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% else %}
+    <div class="card" style="text-align: center; padding: 3rem;">
+        <h2 style="color: #666; margin-bottom: 1rem;">Заказов пока нет</h2>
+        <p style="color: #999; margin-bottom: 2rem;">Нет доступных заказов для администрирования.</p>
+        <a href="{{ url_for('admin_dashboard') }}" class="btn btn-secondary">
+            ← Назад в админку
+        </a>
+    </div>
+{% endif %}
+{% endblock %}

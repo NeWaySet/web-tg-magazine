@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+
+{% block title %}Корзина - Web Market{% endblock %}
+
+{% block content %}
+<h1 style="margin-bottom: 2rem;">Корзина</h1>
+
+{% if items %}
+    <div class="card">
+        <!-- Список товаров -->
+        <div style="margin-bottom: 2rem;">
+            {% for item in items %}
+                <div style="display: grid; grid-template-columns: 180px 1fr 170px 130px; gap: 1rem; align-items: center; padding: 1.5rem 0; border-bottom: 1px solid #eee; {% if not loop.last %}border-bottom: 1px solid #eee;{% endif %}">
+                    <!-- Картинка товара -->
+                    <div style="text-align: left;">
+                        <img
+                            src="{{ url_for('static', filename='images/' ~ item.product_id ~ '.png') }}"
+                            onerror="this.onerror=null; this.src='{{ url_for('static', filename='images/default.png') }}';"
+                            class="cart-product-image"
+                            alt="{{ item.name }}"
+                        />
+                    </div>
+
+                    <!-- Информация о товаре -->
+                    <div>
+                        <h3 style="margin-bottom: 0.5rem; color: #667eea;">{{ item.name }}</h3>
+                        <p style="color: #666; font-size: 0.9rem;">{{ item.description[:80] }}{% if item.description|length > 80 %}...{% endif %}</p>
+                        <p style="color: #e74c3c; font-weight: bold; margin-top: 0.5rem;">
+                            {{ "%.2f"|format(item.price_at_time) }} руб./шт.
+                        </p>
+                    </div>
+                    
+                    <!-- Количество -->
+                    <div style="width: 170px;">
+                        <form method="POST" action="{{ url_for('update_cart_item_route', item_id=item.id) }}" style="display: flex; flex-direction: column; gap: 0.5rem; align-items: center;">
+                            <input type="number" name="quantity" value="{{ item.quantity }}" min="0" max="{{ item.stock }}" class="form-control" style="width: 90px; text-align: center;">
+                            <button type="submit" class="btn" style="padding: 0.5rem 1rem; width: 120px;">Обновить</button>
+                        </form>
+                        <p style="font-size: 0.8rem; color: #999; margin-top: 0.25rem; text-align: center;">Доступно: {{ item.stock }}</p>
+                    </div>
+                    
+                    <!-- Стоимость позиции -->
+                    <div style="text-align: right; min-width: 130px;">
+                        <p style="font-size: 0.9rem; color: #666;">Итого:</p>
+                        <p style="font-size: 1.25rem; font-weight: bold; color: #e74c3c;">
+                            {{ "%.2f"|format(item.quantity * item.price_at_time) }} руб.
+                        </p>
+                    </div>
+                    
+                    <!-- Удаление -->
+                    <div>
+                        <form method="POST" action="{{ url_for('remove_from_cart_route', item_id=item.id) }}" onsubmit="return confirm('Удалить этот товар из корзины?');">
+                            <button type="submit" class="btn btn-secondary" style="background: #e74c3c; padding: 0.5rem 1rem; width: 120px;">
+                                Удалить
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+        
+        <!-- Общая стоимость и оформление -->
+        <div style="background: #f8f9fa; padding: 1.5rem; border-radius: 5px; margin-top: 1rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                <h2 style="margin: 0;">Общая стоимость:</h2>
+                <p style="font-size: 2rem; font-weight: bold; color: #e74c3c; margin: 0;">
+                    {{ "%.2f"|format(total) }} руб.
+                </p>
+            </div>
+            
+            <form method="POST" action="{{ url_for('place_order_route') }}">
+                <button type="submit" class="btn" style="width: 100%; padding: 1rem; font-size: 1.2rem;">
+                    Оформить заказ
+                </button>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Продолжить покупки -->
+    <div style="margin-top: 1.5rem; text-align: center;">
+        <a href="{{ url_for('catalog') }}" class="btn btn-secondary">
+            ← Продолжить покупки
+        </a>
+    </div>
+    
+{% else %}
+    <div class="card" style="text-align: center; padding: 3rem;">
+        <h2 style="color: #666; margin-bottom: 1rem;">Ваша корзина пуста</h2>
+        <p style="color: #999; margin-bottom: 2rem;">Добавьте товары из каталога, чтобы начать покупки.</p>
+        <a href="{{ url_for('catalog') }}" class="btn">
+            Перейти в каталог
+        </a>
+    </div>
+{% endif %}
+{% endblock %}
