@@ -3,3 +3,6 @@
 __pycache__/
 *.pyc
 *.log
+diploma/tmp/
+diploma/docx_preview/
+diploma/pptx_workspace/

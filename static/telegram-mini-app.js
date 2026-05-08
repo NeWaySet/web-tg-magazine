@@ -282,6 +282,40 @@
         state.paymentMethods = data.methods || [];
     }
 
+    async function logout() {
+        try {
+            await api('/api/market/auth/logout', {
+                method: 'POST',
+                body: '{}'
+            });
+        } catch (error) {
+            notify(error.message);
+        }
+        state.user = null;
+        state.authenticated = false;
+        state.cart = { items: [], total: 0 };
+        state.orders = [];
+        state.currentPayment = null;
+        renderAuthState('Вы вышли. Нажмите повторный вход, чтобы снова авторизоваться через Telegram.');
+        renderCart();
+        renderOrders();
+        switchView('catalog');
+    }
+
+    async function refreshAll() {
+        if (!state.authenticated) {
+            const ok = await authenticate();
+            if (!ok) return;
+        }
+        await loadProducts(true);
+        await loadCart();
+        if (state.activeView === 'orders') {
+            await loadOrders();
+        }
+        notify('Данные обновлены');
+        haptic('success');
+    }
+
     async function openProduct(productId) {
         try {
             const data = await api(`/api/telegram/products/${productId}`);
@@ -475,7 +509,10 @@
             }
             const action = target.dataset.action;
             if (action === 'refresh') {
-                loadProducts(true);
+                refreshAll();
+            }
+            if (action === 'logout') {
+                logout();
             }
             if (action === 'open-product') {
                 openProduct(target.dataset.productId);

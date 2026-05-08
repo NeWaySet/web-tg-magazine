@@ -114,7 +114,7 @@
     function renderAuth() {
         const name = state.user?.name || state.user?.email || 'Аккаунт';
         els.accountChip.hidden = !state.authenticated;
-        els.authButton.hidden = state.authenticated && isTelegram;
+        els.authButton.hidden = false;
         els.authButton.textContent = state.authenticated ? 'Выйти' : 'Войти';
         els.accountName.textContent = name;
         els.accountAvatar.textContent = name.trim().charAt(0).toUpperCase() || 'U';
@@ -321,6 +321,22 @@
         } catch (error) {
             notify(error.message);
         }
+    }
+
+    async function refreshAll() {
+        try {
+            await checkSession();
+        } catch (error) {
+            state.authenticated = false;
+            state.user = null;
+            renderAuth();
+        }
+        await loadProducts(true);
+        await loadCart();
+        if (document.getElementById('view-orders')?.classList.contains('is-active')) {
+            await loadOrders();
+        }
+        notify('Данные обновлены');
     }
 
     async function checkSession() {
@@ -551,9 +567,9 @@
             }
 
             const action = target.dataset.action;
-            if (action === 'refresh') loadProducts(true);
+            if (action === 'refresh') await refreshAll();
             if (action === 'open-auth') {
-                if (state.authenticated && !isTelegram) await logout();
+                if (state.authenticated) await logout();
                 else if (!state.authenticated) openAuth('login');
             }
             if (action === 'close-auth' || action === 'close-modal') closeModals();
